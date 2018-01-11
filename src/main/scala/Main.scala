@@ -1,10 +1,10 @@
-package MainPac
+package backend
 
-import MainPac.Db.DataBaseService
 import akka.actor._
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
+import backend.db.DataBaseService
 import io.getquill.{H2JdbcContext, SnakeCase}
 
 import scala.concurrent.duration._
@@ -16,12 +16,7 @@ object Main extends  RestInterface with App  {
 
   implicit val system = ActorSystem("CartSystem")
   implicit val materializer = ActorMaterializer() // dah leh ?
-
-
   implicit val executionContext = system.dispatcher
-  implicit val timeout = Timeout(10 seconds)
-
- // val api = routes
 
   Http().bindAndHandle(routes, host, port) map { binding =>
     println(s"REST interface bound to ${binding.localAddress}") } recover { case ex =>

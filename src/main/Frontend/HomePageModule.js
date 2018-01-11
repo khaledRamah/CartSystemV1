@@ -80,7 +80,7 @@ var MyController=HomePageModule.controller('MainController',function($scope, $re
 
             cartResource.update({cartId :_CartId} ,NewCart),
                                  function(Response){
-                                 document.getElementById("TxtCartID").value= Response.id
+                                 //document.getElementById("TxtCartID").value= Response.id
                                  },
                                  function(Error){
                                  console.log("Error",Error)
@@ -109,10 +109,6 @@ var MyController=HomePageModule.controller('MainController',function($scope, $re
                 $scope.ShoppingCart=ResetCart();
 
         }
-
-
-
-
 
 })
 
