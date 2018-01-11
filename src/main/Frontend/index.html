@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="MainModule">
+<head>
+
+
+    <meta charset="UTF-8">
+    <title>Shopping Cart</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- //for-mobile-apps -->
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="all" />
+    <!-- font-awesome icons -->
+    <link href="css/font-awesome.css" rel="stylesheet">
+    <!-- //font-awesome icons -->
+    <!-- js -->
+    <script src="js/jquery-1.11.1.min.js"></script>
+    <!-- //js -->
+    <link href='//fonts.googleapis.com/css?family=Raleway:400,100,100italic,200,200italic,300,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800,800italic' rel='stylesheet' type='text/css'>
+    <!-- start-smoth-scrolling -->
+    <script type="text/javascript" src="js/move-top.js"></script>
+    <script type="text/javascript" src="js/easing.js"></script>
+
+</head>
+<body ng-controller="MainController">
+<div class="products">
+
+
+    <div class="container">
+        <div class="col-md-5 products-left">
+            <div class="categories">
+                <h2>Your Shopping Cart</h2>
+
+                    <!-- Custom directive-->
+                    <Buttons-List ></Buttons-List>
+
+                <ul class="cate" style="padding : 0px">
+
+                        <All-Cart ></All-Cart>
+
+                </ul>
+                <h5 > With total Price = {{ShoppingCart.TotalPrice}} </h5>
+            </div>
+        </div>
+        <div class="col-md-7 products-right" >
+            <All-Items></All-Items>
+        </div>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.9/angular.min.js"></script>
+<script src="HomePageModule.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.16/angular-resource.min.js"></script>
+
+</body>
+</html>

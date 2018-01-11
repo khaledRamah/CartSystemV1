@@ -1,0 +1,25 @@
+<div class="agile_top_brands_grids">
+    <div class="col-md-4 top_brand_left" ng-repeat="(Id ,value) in ShopItemsList">
+        <div class="hover14 column">
+            <div class="agile_top_brand_left_grid">
+                <div class="agile_top_brand_left_grid1"  >
+                    <figure>
+                        <div class="snipcart-item block">
+                            <div class="snipcart-thumb">
+                                <a href="single.html"><img title=" " alt=" " src="images/{{Id}}.png"></a>
+                                <p>{{value.Name}}</p>
+                                <h4>$ {{value.Price}}</h4>
+
+                            </div>
+                            <div class="snipcart-details top_brand_home_details">
+                                <fieldset>
+                                    <input ng-click="AddItemToCart(Id); open()" type="submit"  value="Add to cart" class="button">
+                                </fieldset  >
+                            </div>
+                        </div>
+                    </figure>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

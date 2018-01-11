@@ -1,0 +1,21 @@
+{
+  "name": "scala",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Test/index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@uirouter/angularjs": "^1.0.12",
+    "angular": "^1.6.8",
+    "angular-mocks": "^1.6.8",
+    "angular-ui-router": "^1.0.3",
+    "jasmine-core": "^2.8.0",
+    "karma": "^2.0.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^1.1.1"
+  }
+}
