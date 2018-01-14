@@ -1,0 +1,14 @@
+<div class="row">
+           <div class="col-md-12">
+               <h3>new items in cart</h3>
+               <ul>
+                   <li ng-repeat="cartItem in cartDirectiveInfo.itemsList track by $index" >
+                       <ul style="padding : 0px">
+                           <h5 class="col-md-10 products-left" >{{shopItemsList[cartItem].name}}</h5>
+                           <button  class="button"  tybe="button"  ng-click="removeFromShoppingCart(cartItem,$index,shoppingCart)">x</button>
+                       </ul>
+                   </li>
+               </ul>
+               <h4>Total price = {{cartDirectiveInfo.totalPrice}} $</h4>
+           </div>
+</div>

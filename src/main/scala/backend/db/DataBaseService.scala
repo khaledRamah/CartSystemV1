@@ -20,26 +20,26 @@ trait AllDbServices{
         }
 
         ctx.run(addToCartsTable(newCart))
-        ctx.run(addToSoldItems(cartItems, newCart.Id))
+        ctx.run(addToSoldItems(cartItems, newCart.id))
       }
 
       def findCart(CartId: Int): CombinedCart = {
 
 
         def getFromCartTable(cartId: Int) = quote {
-          query[Carts].filter(cart => cart.Id == lift(CartId))
+          query[Carts].filter(cart => cart.id == lift(CartId))
         }
 
         def getFromSoldItemsTable(cartId: Int) = quote {
-          query[SoldItems].filter(Item => Item.CartId == lift(cartId))
+          query[SoldItems].filter(Item => Item.cartId == lift(cartId))
         }
 
         val MinCart = ctx.run(getFromCartTable(CartId))
-        val MinCartItems = ctx.run(getFromSoldItemsTable(CartId)).map(Item => Item.ItemId)
+        val MinCartItems = ctx.run(getFromSoldItemsTable(CartId)).map(Item => Item.itemId)
 
         //  println(MinCart)
         if (MinCart.nonEmpty)
-          CombinedCart(MinCart.head.Id, MinCartItems, MinCart.head.TotalPrice)
+          CombinedCart(MinCart.head.id, MinCartItems, MinCart.head.totalPrice)
         else
           CombinedCart(0, List(), 0)
 
@@ -47,11 +47,11 @@ trait AllDbServices{
 
       def deleteCart(CartId: Int): Unit = {
         def deleteFromCartTable(cartId: Int) = quote {
-          query[Carts].filter(cart => cart.Id == lift(CartId)).delete
+          query[Carts].filter(cart => cart.id == lift(CartId)).delete
         }
 
         def deleteFormSoldItems(cartId: Int) = quote {
-          query[SoldItems].filter(Item => Item.CartId == lift(cartId)).delete
+          query[SoldItems].filter(Item => Item.cartId == lift(cartId)).delete
         }
 
         ctx.run(deleteFromCartTable(CartId))
@@ -62,13 +62,13 @@ trait AllDbServices{
       def updateCart(newCart: Carts, cartItems: List[Int]): Unit = {
 
         def updateInCartTable(myNewCart: Carts) = quote {
-          query[Carts].filter(cart => cart.Id == lift(myNewCart.Id)).update(lift(myNewCart))
+          query[Carts].filter(cart => cart.id == lift(myNewCart.id)).update(lift(myNewCart))
 
         }
 
         def updateInSoldItems(cartId: Int, myCartItems: List[Int]): Unit = {
           def deleteOld() = quote {
-            query[SoldItems].filter(Item => Item.CartId == lift(cartId)).delete
+            query[SoldItems].filter(Item => Item.cartId == lift(cartId)).delete
           }
 
           def insertNew() = quote {
@@ -81,7 +81,7 @@ trait AllDbServices{
         }
 
         ctx.run(updateInCartTable(newCart))
-        updateInSoldItems(newCart.Id, cartItems)
+        updateInSoldItems(newCart.id, cartItems)
 
       }
 

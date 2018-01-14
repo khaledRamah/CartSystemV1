@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+
+    <meta charset="UTF-8">
+    <title>Shopping Cart</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- //for-mobile-apps -->
+    <link href="../css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="../css/style.css" rel="stylesheet" type="text/css" media="all" />
+    <!-- font-awesome icons -->
+    <link href="../css/font-awesome.css" rel="stylesheet">
+    <!-- //font-awesome icons -->
+    <!-- js -->
+    <script src="../js/jquery-1.11.1.min.js"></script>
+    <!-- //js -->
+    <link href='//fonts.googleapis.com/css?family=Raleway:400,100,100italic,200,200italic,300,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800,800italic' rel='stylesheet' type='text/css'>
+    <!-- start-smoth-scrolling -->
+    <script type="text/javascript" src="../js/move-top.js"></script>
+    <script type="text/javascript" src="../js/easing.js"></script>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+
+</head>
+<body ng-app="appModule">
+<div class="row" align="center">
+<h3> shopping Cart </h3>
+<ul >
+    <li><a ui-sref="itemsList">Items List</a></li>
+    <li><a ui-sref="cartOperations">My Cart</a></li>
+</ul>
+</div>
+
+<div ui-view></div>
+</body>
+
+<script src="https://code.angularjs.org/1.5.9/angular.min.js"></script>
+<script src="https://code.angularjs.org/1.5.9/angular-resource.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.3/angular-ui-router.js"></script>
+<script src="../js/appJsFiles/app.js"></script>
+<script src="../js/appJsFiles/services.js"></script>
+<script src="../js/appJsFiles/controllers.js"></script>
+<script src="../js/appJsFiles/directives.js"></script>
+</html>

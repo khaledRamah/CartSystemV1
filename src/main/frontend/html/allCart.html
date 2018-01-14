@@ -1,0 +1,43 @@
+
+<div class="col-md-4 products-left" >
+    <div  class="row" >
+        <div class="col-md-12">
+            <div class="input-group" >
+                <textarea class="form-control custom-control" ng-model="idValue" rows="1" style="resize:none" > id</textarea>
+                <span class="input-group-addon btn btn-primary" ng-click="getCart(idValue)" >Get</span>
+                <span class="input-group-addon btn btn-primary" ng-click="saveCart(shoppingCart)" >Create</span>
+                <span class="input-group-addon btn btn-primary" ng-click="deleteCart(idValue)" >Delete</span>
+                <span class="input-group-addon btn btn-primary" ng-click="updateCart(idValue)" >Update</span>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+            <div class="col-md-12">
+                 <h3>old items in cart</h3>
+                 <ul>
+                     <li ng-repeat="cartItem in userCart.itemsList track by $index" >
+
+                             <h5 class="col-md-10 products-left" >{{shopItemsList[cartItem].name}}</h5>
+                         <span class="input-group-addon btn btn-primary" ng-click="removeFromShoppingCart(cartItem,$index,userCart)" >delete</span>
+                     </li>
+                 </ul>
+                 <h4>Total price = {{userCart.totalPrice}} $</h4>
+             </div>
+        </div>
+    <div class="row">
+            <div class="col-md-12">
+                <h3>new items in cart</h3>
+                <ul style="padding : 0px" >
+                    <li ng-repeat="cartItem in shoppingCart.itemsList track by $index" >
+
+                            <h5 class="col-md-10 products-left" >{{shopItemsList[cartItem].name}}</h5>
+                            <span class="input-group-addon btn btn-primary" ng-click="removeFromShoppingCart(cartItem,$index,shoppingCart)" >delete</span>
+
+                    </li>
+                </ul>
+                <h4>Total price = {{shoppingCart.totalPrice}} $</h4>
+            </div>
+        </div>
+<!--<cart-Directive info="shoppingCart" items="shopItemsList"></cart-Directive>-->
+</div>

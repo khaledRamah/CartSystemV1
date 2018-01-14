@@ -14,12 +14,12 @@ case object Failed
 
 class CartService extends Actor  {
 
-  def checkIfValid(Id:Int): Boolean = if(DataBaseService.getCartObject.findCart(Id).Id !=0) true else false
+  def checkIfValid(Id:Int): Boolean = if(DataBaseService.getCartObject.findCart(Id).id !=0) true else false
 
   override def receive: Receive = {
 
     case CreateCart(newCart: CombinedCart) =>
-      DataBaseService.getCartObject.insertCart( Carts(newCart.Id,newCart.TotalPrice),newCart.ItemsList)
+      DataBaseService.getCartObject.insertCart( Carts(newCart.id,newCart.totalPrice),newCart.itemsList)
       sender() ! Done
 
 
@@ -36,7 +36,7 @@ class CartService extends Actor  {
 
 
     case UpdateCart(id :Int ,newCart: CombinedCart) =>
-      DataBaseService.getCartObject.updateCart(Carts(id,newCart.TotalPrice),newCart.ItemsList)
+      DataBaseService.getCartObject.updateCart(Carts(id,newCart.totalPrice),newCart.itemsList)
       sender() ! Done
 
 

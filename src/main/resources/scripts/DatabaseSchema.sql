@@ -1,21 +1,21 @@
 DROP TABLE IF EXISTS Carts;
 CREATE TABLE Carts(
-ID INT PRIMARY KEY NOT Null,
-TotalPrice INT
+id INT PRIMARY KEY NOT Null,
+totalPrice INT
 );
 
 DROP TABLE IF EXISTS Items;
 CREATE TABLE Items(
-ID INT PRIMARY KEY NOT Null,
-Name VARCHAR(50),
-Price INT,
-Description VARCHAR(100)
+id INT PRIMARY KEY NOT Null,
+name VARCHAR(50),
+price INT,
+description VARCHAR(100)
 );
 
 DROP TABLE IF EXISTS SoldItems;
 CREATE TABLE SoldItems(
-CartId INT,
-ItemId INT
+cartId INT,
+itemId INT
 );
 
 
