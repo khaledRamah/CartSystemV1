@@ -1,0 +1,24 @@
+body{
+	background-image: url("../images/CartImg.jpg");
+	background-size: cover;
+	background-position: center;
+	font-family: Lato;
+}
+
+html{
+	height: 100%
+}
+
+#homeContent{
+	text-align: center;
+	padding-top: 10%;
+}
+
+h1{
+	font-weight: 700;
+	font-size: 5m;
+}
+
+hr{
+	width: 400px;
+}

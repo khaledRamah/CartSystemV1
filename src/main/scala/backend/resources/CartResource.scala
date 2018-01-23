@@ -18,10 +18,13 @@ import backend.services.Failed
 
 import scala.collection._
 
+import spray.json._
 trait CartResource  extends Directives with CustomJsonSprySupport{
 
 
   val cartServiceActor:ActorRef = ActorSystem("CartSystem").actorOf(Props[CartService], "cartServiceActor")
+  val itemServiceActor :ActorRef = ActorSystem("CartSystem").actorOf(Props[ItemService], "itemServiceActor")
+  val userServiceActor :ActorRef = ActorSystem("CartSystem").actorOf(Props[UserService], "userServiceActor")
 
   val settings = CorsSettings.defaultSettings.copy(allowedMethods =
     immutable.Seq(GET, POST, HEAD, OPTIONS,HttpMethods.PUT,HttpMethods.DELETE))
@@ -30,17 +33,11 @@ trait CartResource  extends Directives with CustomJsonSprySupport{
 
     implicit val timeout = Timeout(5.seconds)
     pathPrefix("cart"){
-       {
+      pathEnd {
         post {
-          entity(as[CombinedCart]) { ShoppingCart =>
-            println(ShoppingCart)
-         /*   val test =(cartServiceActor ? CreateCart(ShoppingCart))
-            onComplete(cartServiceActor ? CreateCart(ShoppingCart)) {
-              case Success(id :Int ) => complete(ToResponseMarshallable (new MyInt(id)))
-              case Failure(ex) => complete("Failure")
-            }
-        */
-           onSuccess(cartServiceActor ? CreateCart(ShoppingCart)) {
+          entity(as[Carts]) { minCart =>
+            println(minCart)
+           onSuccess(cartServiceActor ? CreateCart(minCart)) {
               case Done =>
                 complete(StatusCodes.OK)
               case _ =>
@@ -48,13 +45,12 @@ trait CartResource  extends Directives with CustomJsonSprySupport{
             }
           }
         }
-
-      } ~ // ma3naha eh ?
-        path(Segment) {
+      } ~
+      path(Segment) {
           Id =>
             get {
               onSuccess(cartServiceActor ? GetCart(Id.toInt)) {
-                case wantedCart: CombinedCart =>
+                case wantedCart: FullCart =>
                   complete(ToResponseMarshallable(wantedCart))
                 case Failed =>
                   complete("This cart was not found");
@@ -73,9 +69,8 @@ trait CartResource  extends Directives with CustomJsonSprySupport{
                 }
               } ~
               put {
-                entity(as[CombinedCart]) { updatedCart =>
-                  println(updatedCart)
-                  onSuccess(cartServiceActor ? UpdateCart(Id.toInt ,updatedCart)) {
+                entity(as[Carts]) { updatedCart =>
+                  onSuccess(cartServiceActor ? UpdateCart(updatedCart)) {
                     case Done =>
                       complete(StatusCodes.OK)
                     case Failed =>
@@ -88,22 +83,51 @@ trait CartResource  extends Directives with CustomJsonSprySupport{
               }
         }
     } ~
-      pathPrefix("Items") {
+    pathPrefix("item") {
         pathEnd {
           get {
-
-            onSuccess(cartServiceActor ? GetWebSitItems()) {
+            onSuccess(itemServiceActor ? GetItems ()) {
               case allItems : ItemsList =>
                 complete(ToResponseMarshallable (allItems))
               case _ =>
-                complete(StatusCodes.InternalServerError)
+                complete("there was error")
             }
-
-
           }
         }
-
+      }~
+    pathPrefix("user") {
+     pathEnd{
+       post{
+         entity(as[Users]) { user =>
+           if (user.id == -1)
+           onSuccess( userServiceActor ? RegisterUser(user)){
+             case newUser :Users => complete(ToResponseMarshallable(newUser))
+             case _ =>  complete(StatusCodes.InternalServerError)
+           }
+           else
+             onSuccess( userServiceActor ? GetUser(user)){
+               case userData :Users => complete(ToResponseMarshallable( userData))
+               case _ =>  complete(StatusCodes.InternalServerError)
+             }
+         }
+       }
       }
+    }~
+    pathPrefix("fullCart") {
+      pathEnd {
+        post {
+          entity(as[FullCart]) { shoppingCart =>
+            println(shoppingCart)
+            onSuccess(cartServiceActor ? ConfirmItems(shoppingCart)) {
+              case Done =>
+                complete(StatusCodes.OK)
+              case _ =>
+                complete(StatusCodes.InternalServerError)
+            }
+          }
+        }
+      }
+    }
   }
 }
 

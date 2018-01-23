@@ -4,11 +4,13 @@ import akka.actor.Actor
 import backend.db.DataBaseService
 import backend.entities._
 
-case class CreateCart(cart: CombinedCart)
+case class CreateCart(cart: Carts)
 case class GetCart(id:Int)
 case class GetWebSitItems()
 case class DeleteCart(id:Int)
-case class UpdateCart(id :Int ,newCart: CombinedCart)
+case class UpdateCart(newCart: Carts)
+case class AddItemCart(cartId :Int,itemId :Int)
+case class ConfirmItems(cartobj :FullCart)
 case object Done
 case object Failed
 
@@ -18,8 +20,8 @@ class CartService extends Actor  {
 
   override def receive: Receive = {
 
-    case CreateCart(newCart: CombinedCart) =>
-      DataBaseService.getCartObject.insertCart( Carts(newCart.id,newCart.totalPrice),newCart.itemsList)
+    case CreateCart(newCart: Carts) =>
+      DataBaseService.getCartObject.insertCart( Carts(newCart.id,newCart.totalPrice))
       sender() ! Done
 
 
@@ -35,17 +37,9 @@ class CartService extends Actor  {
       else  sender() ! Failed
 
 
-    case UpdateCart(id :Int ,newCart: CombinedCart) =>
-      DataBaseService.getCartObject.updateCart(Carts(id,newCart.totalPrice),newCart.itemsList)
+    case ConfirmItems(cartObj :FullCart) =>
+      DataBaseService.getCartObject.updateCart(cartObj)
       sender() ! Done
-
-
-    case GetWebSitItems() =>
-      var Items :Map[String,Item] = Map()
-     (1 until 16 ) foreach (elementNumber => {
-       Items += (elementNumber.toString->   Item("Item " + elementNumber.toString, elementNumber, "Description " + elementNumber.toString))
-     })
-       sender() !  ItemsList(Items)
 
   }
 }

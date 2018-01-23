@@ -5,25 +5,19 @@ import io.getquill._
 
 trait AllDbServices{
 
-    class cartMethods{
-      val ctx = new H2JdbcContext(CamelCase, "Context")
+  val ctx = new H2JdbcContext(CamelCase, "Context")
+  import ctx._
 
-      import ctx._
+  class CartMethods{
 
-      def insertCart(newCart: Carts, cartItems: List[Int]) {
+      def insertCart(newCart: Carts) {
         def addToCartsTable(myNewCart: Carts) = quote {
           query[Carts].insert(lift(myNewCart))
         }
-
-        def addToSoldItems(myItems: List[Int], cartId: Int) = quote {
-          liftQuery(myItems).foreach(ItemID => query[SoldItems].insert(SoldItems(lift(cartId), ItemID)))
-        }
-
         ctx.run(addToCartsTable(newCart))
-        ctx.run(addToSoldItems(cartItems, newCart.id))
       }
 
-      def findCart(CartId: Int): CombinedCart = {
+      def findCart(CartId: Int): FullCart = {
 
 
         def getFromCartTable(cartId: Int) = quote {
@@ -31,17 +25,24 @@ trait AllDbServices{
         }
 
         def getFromSoldItemsTable(cartId: Int) = quote {
-          query[SoldItems].filter(Item => Item.cartId == lift(cartId))
+          query[SoldItems].filter(Item => Item.cartId == lift(cartId)).map(x => SoldItems(x.id,x.cartId,x.itemId))
         }
 
-        val MinCart = ctx.run(getFromCartTable(CartId))
-        val MinCartItems = ctx.run(getFromSoldItemsTable(CartId)).map(Item => Item.itemId)
+        def getFullSoldItems (ids :List[SoldItems]) = {
+          def getOne (id:Int)= quote {
+             query[WebsiteItems].filter(item => lift(id) == item.id)
+          }
+          ids.flatMap(sItem => ctx.run(getOne(sItem.itemId)))
+        }
 
-        //  println(MinCart)
-        if (MinCart.nonEmpty)
-          CombinedCart(MinCart.head.id, MinCartItems, MinCart.head.totalPrice)
+        val soldCartItems= ctx.run(getFromSoldItemsTable(CartId))
+        val fullCartItems = getFullSoldItems(soldCartItems)
+        val cart = ctx.run(getFromCartTable(CartId))
+        val mergeIndexWithValue =(soldCartItems.map(item =>item.id) zip fullCartItems).map(z => SoldItemDetails(z._1,z._2))
+        if (cart.nonEmpty)
+          FullCart(cart.head.id, SoldItemDetailsList(mergeIndexWithValue), cart.head.totalPrice)
         else
-          CombinedCart(0, List(), 0)
+          FullCart(0, SoldItemDetailsList(List()), 0)
 
       }
 
@@ -59,40 +60,74 @@ trait AllDbServices{
 
       }
 
-      def updateCart(newCart: Carts, cartItems: List[Int]): Unit = {
-
+      def updateCart(updatedCart: FullCart): Unit = {
         def updateInCartTable(myNewCart: Carts) = quote {
           query[Carts].filter(cart => cart.id == lift(myNewCart.id)).update(lift(myNewCart))
-
         }
 
-        def updateInSoldItems(cartId: Int, myCartItems: List[Int]): Unit = {
-          def deleteOld() = quote {
-            query[SoldItems].filter(Item => Item.cartId == lift(cartId)).delete
-          }
-
-          def insertNew() = quote {
-            liftQuery(myCartItems).foreach(ItemID => query[SoldItems].insert(SoldItems(lift(cartId), ItemID)))
-          }
-
-          ctx.run(deleteOld())
-          ctx.run(insertNew())
-
-        }
-
-        ctx.run(updateInCartTable(newCart))
-        updateInSoldItems(newCart.id, cartItems)
-
+        ctx.run(updateInCartTable(Carts(updatedCart.id,updatedCart.totalPrice)))
+        val idsList=updatedCart.itemsList.allSoldItemDetails.map(oneItem => oneItem.myItem.id)
+        soldItemsInstance.addList(idsList,updatedCart.id)
       }
+  }
+  class ItemsMethods{
+    def getAllItems() : List[WebsiteItems]={
+      ctx.run(query[WebsiteItems])
+    }
+  }
+  class UserMethods{
+    def registerUser(newUser:Users): Int ={
+      def insert(newUser:Users) = quote {
+        query[Users].insert(lift(newUser)).returning(_.id)
+      }
+      ctx.run(insert(newUser))
+    }
+    def findUser(myUser:Users) : Users = {
+      def find(myUser:Users) =quote{
+        query[Users].filter(oneUser =>
+          oneUser.email == lift(myUser.email) && oneUser.password ==lift(myUser.password))
+      }
+      val res = ctx.run(find(myUser))
+      if( res.nonEmpty) res.head else Users(0,"","","")
+    }
+  }
+  class SoldItemsMethods{
 
+    def addItem(soldItem :SoldItems): Unit = {
+
+      def insert(soldItem: SoldItems) = quote {
+          query[SoldItems].insert(lift(soldItem)).returning(_.id)
+        }
+        ctx.run(insert(soldItem))
+    }
+    def deleteItem(id :Int): Unit ={
+
+      def delete(id :Int) = quote {
+        query[SoldItems].filter(sItem => sItem.id == lift(id)).delete
+      }
+      ctx.run(delete(id))
+    }
+    def addList(itemsIds:List[Int],cartId:Int): Unit = {
+
+      def insert(myItemsIds:List[Int],myCartId:Int) = quote {
+        liftQuery(itemsIds).foreach(itemId => query[SoldItems].insert(SoldItems(0,lift(myCartId),itemId)).returning(_.id))
+      }
+      ctx.run(insert(itemsIds,cartId))
+    }
 
   }
 
-  val CartInstance :cartMethods= new cartMethods()
+  val cartInstance :CartMethods = new CartMethods()
+  val itemInstance :ItemsMethods = new ItemsMethods()
+  val userInstance :UserMethods = new UserMethods()
+  val soldItemsInstance :SoldItemsMethods = new SoldItemsMethods()
 
 }
 object DataBaseService extends AllDbServices
 {
-  def getCartObject : cartMethods= CartInstance
+  def getCartObject : CartMethods = cartInstance
+  def getItemMethods : ItemsMethods = itemInstance
+  def getUserMethods : UserMethods = userInstance
+  def getSoldItemMethods : SoldItemsMethods = soldItemsInstance
 }
 

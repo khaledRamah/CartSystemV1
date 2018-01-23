@@ -1,10 +1,8 @@
 # CartSystem
 
 To start the project run Main.scala 
-open home.html 
+open start.html 
 
+register as new user then login  then pick from allItems
 
-
-Notes :
-	 when you do any operation you have to provide your cart id 
-	 when you create anew cart put anew id for your cart
+then go to mycart tab  click confirm .  

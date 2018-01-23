@@ -1,91 +1,89 @@
 
-myApp.controller("itemsController",function($scope,itemResource,$rootScope){
+myApp.controller("itemsController",function($scope,itemResource,$rootScope,SharedMethods){
 
-     itemResource.get().$promise.then(
-        function(response){
-          $rootScope.shopItemsList = response.items;
-        },function(Error){
-          console.log("Error", Error)
-        });
+   var item ={id:0,myItem:{}};
+   function GetItems(){
+      itemResource.get().$promise.then(
+            function(response){
+                $scope.shopItemsList =response.items;
+            },
+            function(Error){console.log("Error", Error)
+         });
+    }
+   $scope.addItemToCart = function(addedItem) {
+        item.myItem = addedItem;
+        SharedMethods.addSoldItem(angular.copy(item));
+    };
 
-   $scope.addItemToCart = function(addedItemId) {
-                $scope.shoppingCart.totalPrice += $scope.shopItemsList[addedItemId].price;
-                $scope.shoppingCart.itemsList.push(  parseInt(addedItemId) );
-            };
-
+    GetItems();
 })
 
-myApp.controller("cartController",function($scope,cartResource,$rootScope){
-    var doResetAfterAnyOperation= function()
-    {
-        $rootScope.shoppingCart=angular.copy($rootScope.baseCart);
-        $scope.userCart=angular.copy($rootScope.baseCart);
-    }
-
-    $scope.idValue=0;
-    $scope.userCart;
-
-    $scope.removeFromShoppingCart =function (removedItemId,index,cartToDeleteFrom){
-        cartToDeleteFrom.totalPrice -= $scope.shopItemsList[removedItemId].price;
-        cartToDeleteFrom.itemsList.splice(index,1)
+myApp.controller("cartController",function($scope,cartResource,$rootScope,SharedMethods,fullCartResource){
+    var minCart = {id  :0 ,totalPrice :0}
+    $scope.userCart={
+        id:0,
+        itemsList:{ allSoldItemDetails:[] },
+        totalPrice : 0
+    };
+    $scope.userCart = SharedMethods.getCart();
+    $scope.removeFromShoppingCart =function (index){
+        SharedMethods.deleteSoldItem(index);
+        $scope.userCart = SharedMethods.getCart()
      };
 
-    $scope.getCart =function(cartId){
-       cartResource.get({cartId: cartId}).$promise.then(function(myCart)
-         {
-            $scope.userCart= myCart;
-         },function(Error){
-            console.log("Error", Error)
+    $scope.confirm =function(){
+        fullCartResource.save( $scope.userCart).$promise.then(
+            function(){
+                SharedMethods.reset();
+                $scope.userCart = SharedMethods.getCart()
+            },function(Error){
+                console.log("Error", Error)
         });
     }
 
-    $scope.updateCart = function(cartId){
+    /*function findUserCart(){
+           cartResource.get({cartId: id}).$promise.then(
+                function(myCart){
+                    $scope.userCart = myCart;
+                },function(Error){
+                    console.log("Error", Error)
+            });
+        }*/
 
-        $scope.userCart.totalPrice += $scope.shoppingCart.totalPrice;
-          for(var itemId in $scope.shoppingCart.itemsList)
-            $scope.userCart.itemsList.push($scope.shoppingCart.itemsList[itemId])
-
-            cartResource.update({cartId :cartId} ,$scope.userCart).$promise.then(
-                                 function(response){
-
-                                 },
-                                 function(Error){
-                                 console.log("Error",Error)
-                              });
- doResetAfterAnyOperation();
-         }
-
-    $scope.saveCart = function (createdCart){
-            createdCart.id= parseInt($scope.idValue);
-             cartResource.save(createdCart).$promise.then(
-                     function(response){
-                       doResetAfterAnyOperation();
-                     },
-                     function(Error){
-                     console.log("Error",Error)
-                  });
-
-         }
-
-    $scope.deleteCart = function (cartId){
-            cartResource.delete({cartId: cartId}).$promise.then(
-               function(response){
-                    doResetAfterAnyOperation()
-               },function(Error){
-               console.log("Error", Error)
-                });
-
-
-        }
 })
-/*.directive('cartDirective', function() {
-    return {
-        restrict: 'E',
-        scope :{
-            cartDirectiveInfo : '=info',
-            shopItemsList :'=items'
-        },
-        templateUrl: '../html/cartItems.html'
-    };
-});*/
 
+myApp.controller("userController",function($scope,userResource,$state,SharedMethods){
+    function doReset(){
+        return {id: -1,name:'' ,email:'' ,password :''};
+    }
+
+   $scope.userData= doReset();
+
+   $scope.registerUser =function () {
+        userResource.save($scope.userData).$promise.then(
+            function(response){
+                $scope.userData=doReset();
+                var minCart = {id:response.id ,totalPrice :0};
+                SharedMethods.createUserCart(minCart);
+           },
+           function(Error){ console.log("Error",Error); });
+   }
+
+   $scope.login =function(){
+        $scope.userData.id = 0;
+        userResource.save($scope.userData).$promise.then(
+            function(response){
+                console.log(response);
+                if(response.id!=0)
+                {
+                    signUp.style.display = "none";
+                    login.style.display = "none";
+                    logOut.style.display = "block";
+                    SharedMethods.setId(response.id);
+                    $scope.userData=doReset();
+                    $state.go('itemsList');
+                }
+             },
+            function(Error){ console.log("Error",Error); });
+   }
+})
