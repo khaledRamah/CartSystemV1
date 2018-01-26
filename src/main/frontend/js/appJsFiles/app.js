@@ -4,6 +4,12 @@ myApp.config(function($stateProvider,$urlRouterProvider)
 {
     $urlRouterProvider.otherwise('/hiPage');
     $stateProvider
+        .state("hiPage",{
+            url :"/hiPage",
+            controller :'',
+            templateUrl :'hiPage.html'
+        })
+
         .state("itemsList",{
             url:'/allItems',
             controller :'itemsController',
@@ -22,14 +28,20 @@ myApp.config(function($stateProvider,$urlRouterProvider)
             templateUrl :'signUp.html'
         })
 
-        .state("hiPage",{
-            url :"/hiPage",
-            controller :'',
-            templateUrl :'hiPage.html'
-        })
         .state("login",{
             url :"/login",
             controller :'userController',
             templateUrl :'login.html'
+        })
+
+        .state("admin",{
+            url :"/admin",
+            controller :'',
+            templateUrl :'admin.html'
+        })
+        .state("admin.addItem",{
+            url :"/newItem",
+            controller :'itemsController',
+            templateUrl :'itemDetails.html'
         })
 })

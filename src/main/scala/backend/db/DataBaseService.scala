@@ -74,6 +74,12 @@ trait AllDbServices{
     def getAllItems() : List[WebsiteItems]={
       ctx.run(query[WebsiteItems])
     }
+    def addItem(item :WebsiteItems): Int ={
+      def insert (item :WebsiteItems) =quote{
+        query[WebsiteItems].insert(lift(item)).returning(_.id)
+      }
+      ctx.run(insert(item))
+    }
   }
   class UserMethods{
     def registerUser(newUser:Users): Int ={

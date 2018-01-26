@@ -1,6 +1,8 @@
 
 myApp.factory('itemResource', function($resource) {
-  return $resource('http://localhost:8080/item',
+  return $resource('http://localhost:8080/item/:itemId',
+   {itemId :'@itemId' },
+    { update: { method: 'PUT' }},
    { headers : { 'Origin': 'http://127.0.0.1:8080' }} );
 });
 

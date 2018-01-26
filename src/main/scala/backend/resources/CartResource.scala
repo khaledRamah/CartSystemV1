@@ -85,6 +85,14 @@ trait CartResource  extends Directives with CustomJsonSprySupport{
     } ~
     pathPrefix("item") {
         pathEnd {
+          post{
+            entity(as[WebsiteItems]) { newItem =>
+              onSuccess(itemServiceActor ? AddNewItem(newItem )) {
+                case id:Int => complete(StatusCodes.OK)
+                case _ => complete(StatusCodes.InternalServerError)
+              }
+            }
+          }~
           get {
             onSuccess(itemServiceActor ? GetItems ()) {
               case allItems : ItemsList =>

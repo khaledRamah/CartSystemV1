@@ -10,7 +10,7 @@ case class GetWebSitItems()
 case class DeleteCart(id:Int)
 case class UpdateCart(newCart: Carts)
 case class AddItemCart(cartId :Int,itemId :Int)
-case class ConfirmItems(cartobj :FullCart)
+case class ConfirmItems(cartObj :FullCart)
 case object Done
 case object Failed
 

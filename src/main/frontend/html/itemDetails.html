@@ -1,0 +1,36 @@
+<div >
+    <div class="col-sm-3"></div>
+    <div class="col-sm-6">
+        <div id="Warning" style="display: none;" class="alert alert-warning">
+            <strong>Warning!</strong> Item was not saved
+        </div>
+        <div id="Success" style="display: none;" class="alert alert-success">
+            <strong>Success!</strong> Your account was successfully created.
+        </div>
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label for="inputItemName" class="col-sm-2 control-label"> Name</label>
+                <div class="col-sm-10">
+                    <input ng-model="newShopItem.name" type="text" class="form-control" id="inputItemName" placeholder="name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputDescription" class="col-sm-2 control-label">Description</label>
+                <div class="col-sm-10">
+                    <input ng-model="newShopItem.description" type="text" class="form-control" id="inputDescription" placeholder="Description">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPrice" class="col-sm-2 control-label">Price</label>
+                <div class="col-sm-2">
+                    <input ng-model="newShopItem.price" type="text" class="form-control" id="inputPrice" placeholder="price">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button ng-click="addWebsiteItem()" type="submit" class="btn btn-default">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

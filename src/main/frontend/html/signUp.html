@@ -1,24 +1,31 @@
-<div class="col-lg-4"></div>
-<div class="col-lg-4">
-    <form>
-        <div class="form-group">
-            <label for="userName">First Name</label>
-            <input type="text" class="form-control" id="userName" ng-model="userData.name" placeholder="Name">
+<div class="row">
+    <div class="col-lg-4"></div>
+    <div class="col-lg-4">
+        <div id="Success" style="display: none;" class="alert alert-success">
+            <strong>Success!</strong> Your account was successfully created.
         </div>
-        <div class="form-group">
-            <label for="exampleInputEmail1">Email address</label>
-            <input type="email" class="form-control" id="exampleInputEmail1"  ng-model="userData.email" placeholder="Email">
+        <div id="Warning" style="display: none;" class="alert alert-warning">
+            <strong>Warning!</strong> There was an error while creating your account.
         </div>
-        <div class="form-group">
-            <label for="exampleInputPassword1">Password</label>
-            <input type="password" class="form-control" id="exampleInputPassword1"  ng-model="userData.password" placeholder="Password">
-        </div>
-        <div class="form-group">
-            <label for="exampleInputFile">Add photo</label>
-            <input type="file" id="exampleInputFile">
-        </div>
+        <form>
+            <div class="form-group">
+                <label for="userName">First Name</label>
+                <input type="text" class="form-control" id="userName" ng-model="userData.name" placeholder="Name">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputEmail1">Email address</label>
+                <input type="email" class="form-control" id="exampleInputEmail1"  ng-model="userData.email" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">Password</label>
+                <input type="password" class="form-control" id="exampleInputPassword1"  ng-model="userData.password" placeholder="Password">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputFile">Add photo</label>
+                <input type="file" id="exampleInputFile">
+            </div>
 
-        <button type="submit" class="btn btn-default" ng-click="registerUser()">Submit</button>
-    </form>
+            <button type="submit" class="btn btn-default" ng-click="registerUser()">Submit</button>
+        </form>
+    </div>
 </div>
-
