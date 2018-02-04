@@ -34,10 +34,10 @@ trait SlickDBService {
       })
     }
     def updateCart(userFullCart: FullCart): Future[FullCart] ={
-      val query= slickCartObj.filter(c => c.id === userFullCart.userCart.userId)
+      val query= slickCartObj.filter(c => c.id === userFullCart.userCart.id)
       val queryAction =query.update(userFullCart.userCart)
       val userItems: List[Int] =userFullCart.itemsList.allSoldItemDetails.map(item => item.myItem.id)
-      db.run(queryAction).flatMap(u => SlickSoldItemsMethods.insertSoldItems(userItems,userFullCart.userCart.id)).flatMap(items => findFullCart(userFullCart.userCart.userId))
+      db.run(queryAction).flatMap(u => SlickSoldItemsMethods.insertSoldItems(userItems,userFullCart.userCart.id)).flatMap(items => findFullCart(userFullCart.userCart.id))
     }
   }
 
@@ -93,5 +93,5 @@ trait SlickDBService {
     })
   }
 
-  defineDB(List(slickUsersObj.schema,slickCartObj.schema,slickItemsObj.schema,slickSoldItemsObj.schema))
+  def CreateSchema =defineDB(List(slickUsersObj.schema,slickCartObj.schema,slickItemsObj.schema,slickSoldItemsObj.schema))
 }

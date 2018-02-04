@@ -14,8 +14,8 @@ myApp.factory('cartResource', function($resource) {
 });
 
 myApp.factory('userResource',function($resource){
-    return $resource('http://localhost:8080/user/:userId',
-     {cartId :'@userId' },
+    return $resource('http://localhost:8080/user/:email',
+     {userEmail :'@email' },
      { update: { method: 'PUT' }},
      { headers : { 'Origin': 'http://127.0.0.1:8080' }} );
 })
@@ -29,41 +29,34 @@ myApp.factory('fullCartResource',function($resource){
 
 myApp.service('SharedMethods',function(cartResource,$rootScope){
     function doReset(){
-        cart.itemsList.allSoldItemDetails = [];
-        cart.totalPrice = 0 ;
+        cart.itemsList = {allSoldItemDetails:[]} ;
+        cart.userCart.id =0;
+        cart.userCart.totalPrice=0;
     }
     var cart={
-        id:0,
-        itemsList:{ allSoldItemDetails:[] },
-        totalPrice : 0
+        userCart:{id: 0,userId: 0,totalPrice: 0},
+        itemsList:{allSoldItemDetails:[]}
     };
     this.reset =function (){
-        cart =doReset();
+        doReset();
     }
     this.addSoldItem = function (newItem) {
            console.log(cart);
            cart.itemsList.allSoldItemDetails.push(newItem);
-           cart.totalPrice += newItem.myItem.price;
+           cart.userCart.totalPrice += newItem.myItem.price;
         }
     this.deleteSoldItem =function(index){
-           cart.totalPrice -= cart.itemsList.allSoldItemDetails[index].myItem.price;
+           cart.userCart.totalPrice -= cart.itemsList.allSoldItemDetails[index].myItem.price;
            cart.itemsList.allSoldItemDetails.splice(index, 1);
     }
 
     this.getCart =function(){
       return cart;
     }
-    this.createUserCart = function(cart){
-      return cartResource.save(cart).$promise.then(
-            function(response){ },
-            function(Error){ console.log("Error", Error) });
-    }
 
     this.setId =function(id){
-        cart.id = id;
+        cart.userCart.userId = id;
     }
-
-
 })
 
 

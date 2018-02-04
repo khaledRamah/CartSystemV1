@@ -2,7 +2,7 @@
 
 To start the project run main.scala .
 
-currently project run from terminal 
+open start.html , register then login 
 
 - To register new user :
 curl -v -H "Content-Type: application/json"  -X POST http://localhost:8080/user -d '{"id":0,"name":"myName" ,"email":"e.ex@gmail.com","password" :"123456"}'

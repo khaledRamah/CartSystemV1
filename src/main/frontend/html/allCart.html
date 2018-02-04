@@ -7,7 +7,7 @@
             <div class="col-md-12">
                  <h3>Items in cart</h3>
                  <ul>
-                     <li ng-repeat="cartItem in userCart.itemsList.allSoldItemDetails track by $index" >
+                     <li ng-repeat="cartItem in userFullCart.itemsList.allSoldItemDetails track by $index" >
                          <div class="row">
                              <h5 class="col-md-10 products-left" >{{cartItem.myItem.name}}</h5>
                              <button><i class="fa fa-times" aria-hidden="true" ng-click="removeFromShoppingCart($index)"></i></button>
@@ -15,7 +15,7 @@
                          <!--<span class="input-group-addon btn btn-primary"  >delete</span> -->
                      </li>
                  </ul>
-                 <h4>Total price = {{userCart.totalPrice}} $</h4>
+                 <h4>Total price = {{userFullCart.userCart.totalPrice}} $</h4>
              </div>
         </div>
 </div>

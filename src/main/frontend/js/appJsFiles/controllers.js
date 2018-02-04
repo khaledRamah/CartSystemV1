@@ -7,9 +7,9 @@ myApp.controller("itemsController",function($scope,itemResource,$rootScope,Share
         $scope.newShopItem = {id: 0, name: "", price: "",description: ""};
    }
    function GetItems(){
-        itemResource.get().$promise.then(
+        itemResource.query().$promise.then(
             function(response){
-                $scope.shopItemsList =response.items;
+                $scope.shopItemsList =response;
             },
             function(Error){console.log("Error", Error)
         });
@@ -39,28 +39,35 @@ myApp.controller("itemsController",function($scope,itemResource,$rootScope,Share
 })
 
 myApp.controller("cartController",function($scope,cartResource,$rootScope,SharedMethods,fullCartResource){
-    var minCart = {id  :0 ,totalPrice :0}
-    $scope.userCart={
-        id:0,
-        itemsList:{ allSoldItemDetails:[] },
-        totalPrice : 0
-    };
 
-    $scope.userCart = SharedMethods.getCart();
+    $scope.userFullCart = SharedMethods.getCart();
 
     $scope.removeFromShoppingCart =function (index){
         SharedMethods.deleteSoldItem(index);
-        $scope.userCart = SharedMethods.getCart()
+        $scope.userFullCart = SharedMethods.getCart()
      };
 
     $scope.confirm =function(){
-        fullCartResource.save( $scope.userCart).$promise.then(
+        var minCart = SharedMethods.getCart().userCart;
+        createUserCart(minCart);
+    }
+
+    function createUserCart(cart){
+        cartResource.save(cart).$promise.then(
+            function(response){ $scope.userFullCart.userCart.id = response.id;
+            setFullCart();
+            },
+            function(Error){ console.log("Error", Error) });
+    }
+
+    function setFullCart(){
+        fullCartResource.save( $scope.userFullCart).$promise.then(
             function(){
                 SharedMethods.reset();
-                $scope.userCart = SharedMethods.getCart()
+                $scope.userFullCart = SharedMethods.getCart();
             },function(Error){
                 console.log("Error", Error)
-        });
+            });
     }
 })
 
@@ -76,10 +83,7 @@ myApp.controller("userController",function($scope,userResource,$state,SharedMeth
             function(response){
                 // view that account created
                 Success.style.display = "block";
-
                 $scope.userData=doReset();
-                var minCart = {id:response.id ,totalPrice :0};
-                SharedMethods.createUserCart(minCart);
            },
            function(Error){
                  // view that account was not created
@@ -88,22 +92,22 @@ myApp.controller("userController",function($scope,userResource,$state,SharedMeth
    }
 
    $scope.login =function(){
-        $scope.userData.id = 0;
-        userResource.save($scope.userData).$promise.then(
+        userResource.query({email: $scope.userData.email}).$promise.then(
             function(response){
-                console.log(response);
-                if(response.id!=0)
+
+                if(response[0].password == $scope.userData.password)
                 {
                     signUp.style.display = "none";
                     login.style.display = "none";
                     logOut.style.display = "block";
 
-                    SharedMethods.setId(response.id);
+                    SharedMethods.setId(response[0].id);
                     $scope.userData=doReset();
                     $state.go('itemsList');
                 }
              },
             function(Error){
+            console.log(Error)
                 // view that account was not created
                 Warning.style.display = "block";
             });
