@@ -1,8 +1,13 @@
 package backend.services
 
 import akka.actor.Actor
-import backend.db.DataBaseService
+import akka.http.javadsl.server.RequestContext
+import akka.http.scaladsl.server.RouteResult
+import backend.db.{DataBaseService, SlickDBService}
 import backend.entities._
+
+import scala.concurrent.Future
+
 
 case class CreateCart(cart: Carts)
 case class GetCart(id:Int)
@@ -14,32 +19,23 @@ case class ConfirmItems(cartObj :FullCart)
 case object Done
 case object Failed
 
-class CartService extends Actor  {
+class CartService extends Actor with SlickDBService{
 
-  def checkIfValid(Id:Int): Boolean = if(DataBaseService.getCartObject.findCart(Id).id !=0) true else false
+  def checkIfValid(Id:Int): Boolean = true //if(DataBaseService.getCartObject.findCart(Id).userCart.id !=0) true else false
 
   override def receive: Receive = {
 
     case CreateCart(newCart: Carts) =>
-      DataBaseService.getCartObject.insertCart( Carts(newCart.id,newCart.totalPrice))
-      sender() ! Done
+      val cart: Future[Carts]=SlickCartMethods.insertCart(newCart)
+      sender() ! cart
 
-
-    case GetCart(id:Int) => sender() ! DataBaseService.getCartObject.findCart(id)
-
-
-    case DeleteCart(id:Int) =>
-      if (checkIfValid(id) )
-      {
-        DataBaseService.getCartObject.deleteCart(id)
-        sender() ! Done
-      }
-      else  sender() ! Failed
-
+    case GetCart(id:Int) =>
+      val foundCarts : Future[FullCart]= SlickCartMethods.findFullCart(id)
+      sender() !  foundCarts
 
     case ConfirmItems(cartObj :FullCart) =>
-      DataBaseService.getCartObject.updateCart(cartObj)
-      sender() ! Done
+      val fullCart: Future[FullCart] = SlickCartMethods.updateCart(cartObj)
+      sender() ! fullCart
 
   }
 }

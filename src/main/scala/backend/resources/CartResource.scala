@@ -17,8 +17,10 @@ import akka.http.scaladsl.model.HttpMethods._
 import backend.services.Failed
 
 import scala.collection._
-
 import spray.json._
+
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 trait CartResource  extends Directives with CustomJsonSprySupport{
 
 
@@ -32,103 +34,92 @@ trait CartResource  extends Directives with CustomJsonSprySupport{
   def cartRoutes: Route = cors(settings){
 
     implicit val timeout = Timeout(5.seconds)
-    pathPrefix("cart"){
-      pathEnd {
-        post {
-          entity(as[Carts]) { minCart =>
-            println(minCart)
-           onSuccess(cartServiceActor ? CreateCart(minCart)) {
-              case Done =>
-                complete(StatusCodes.OK)
-              case _ =>
-                complete(StatusCodes.InternalServerError)
+    pathPrefix("user") {
+      pathEnd{
+        post{
+          entity(as[Users]) { user =>
+
+            val actorRes = userServiceActor ? RegisterUser(user)
+            onSuccess(actorRes) {
+              case fNewUser : Future[Users] => complete(ToResponseMarshallable(fNewUser))
+              case _ => complete(StatusCodes.InternalServerError)
             }
+            /*  else
+                onSuccess( userServiceActor ? GetUser(user)){
+                  case userData :Users => complete(ToResponseMarshallable( userData))
+                  case _ =>  complete(StatusCodes.InternalServerError)
+                }*/
           }
         }
-      } ~
-      path(Segment) {
-          Id =>
-            get {
-              onSuccess(cartServiceActor ? GetCart(Id.toInt)) {
-                case wantedCart: FullCart =>
-                  complete(ToResponseMarshallable(wantedCart))
-                case Failed =>
-                  complete("This cart was not found");
-                case ex:Exception=>
-                  complete(StatusCodes.InternalServerError,ex)
+      }~
+        path(Segment){
+          userName =>
+            get{
+              val userData= userServiceActor ? GetUser(userName)
+              onSuccess(userData) {
+                case value : Future[Seq[Users]] => complete(ToResponseMarshallable(value))
+                case _ => complete(StatusCodes.InternalServerError)
               }
-            }~
-            delete{
-                onSuccess(cartServiceActor ? DeleteCart(Id.toInt)) {
-                  case Done =>
-                    complete(StatusCodes.OK)
-                  case Failed =>
-                    complete("This cart was not found");
-                  case ex:Exception=>
-                    complete(StatusCodes.InternalServerError,ex)
-                }
-              } ~
-              put {
-                entity(as[Carts]) { updatedCart =>
-                  onSuccess(cartServiceActor ? UpdateCart(updatedCart)) {
-                    case Done =>
-                      complete(StatusCodes.OK)
-                    case Failed =>
-                      complete("This cart was not found");
-                    case ex:Exception=>
-                      complete(StatusCodes.InternalServerError,ex)
-                  }
-
-                }
-              }
+            }
         }
-    } ~
+    }~
     pathPrefix("item") {
         pathEnd {
           post{
             entity(as[WebsiteItems]) { newItem =>
-              onSuccess(itemServiceActor ? AddNewItem(newItem )) {
-                case id:Int => complete(StatusCodes.OK)
+              val insertedItem= itemServiceActor ? AddNewItem(newItem )
+              onSuccess(insertedItem) {
+                case item:Future[WebsiteItems] => complete(ToResponseMarshallable(item))
                 case _ => complete(StatusCodes.InternalServerError)
               }
             }
           }~
           get {
-            onSuccess(itemServiceActor ? GetItems ()) {
-              case allItems : ItemsList =>
-                complete(ToResponseMarshallable (allItems))
-              case _ =>
-                complete("there was error")
+            val itemsList= itemServiceActor ? GetItems ()
+              onSuccess(itemsList) {
+                case allItems : Future[Seq[WebsiteItems]] =>
+                  complete(ToResponseMarshallable (allItems))
+                case _ =>
+                  complete("there was error")
+              }
+            }
+        }
+      }~
+    pathPrefix("cart") {
+      pathEnd {
+        post {
+          entity(as[Carts]) { minCart =>
+            val insertedCart= cartServiceActor ? CreateCart(minCart)
+           onSuccess(insertedCart) {
+             case newCart: Future[Carts]=>
+                complete(ToResponseMarshallable(newCart))
+             case _ =>
+                complete(StatusCodes.InternalServerError)
             }
           }
         }
       }~
-    pathPrefix("user") {
-     pathEnd{
-       post{
-         entity(as[Users]) { user =>
-           if (user.id == -1)
-           onSuccess( userServiceActor ? RegisterUser(user)){
-             case newUser :Users => complete(ToResponseMarshallable(newUser))
-             case _ =>  complete(StatusCodes.InternalServerError)
-           }
-           else
-             onSuccess( userServiceActor ? GetUser(user)){
-               case userData :Users => complete(ToResponseMarshallable( userData))
-               case _ =>  complete(StatusCodes.InternalServerError)
-             }
-         }
-       }
-      }
+      path(Segment) {
+          Id =>
+            get {
+              val wantedCart= cartServiceActor ? GetCart(Id.toInt)
+              onSuccess(wantedCart) {
+                case userFullCart: Future[FullCart] =>
+                  complete(ToResponseMarshallable(userFullCart))
+                case _=>
+                  complete(StatusCodes.InternalServerError)
+              }
+            }
+        }
     }~
     pathPrefix("fullCart") {
       pathEnd {
         post {
           entity(as[FullCart]) { shoppingCart =>
-            println(shoppingCart)
-            onSuccess(cartServiceActor ? ConfirmItems(shoppingCart)) {
-              case Done =>
-                complete(StatusCodes.OK)
+            val userFullCart= cartServiceActor ? ConfirmItems(shoppingCart)
+            onSuccess(userFullCart) {
+              case userCart:Future[FullCart] =>
+                complete(ToResponseMarshallable(userCart))
               case _ =>
                 complete(StatusCodes.InternalServerError)
             }

@@ -8,17 +8,20 @@ resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/re
   Resolver.bintrayRepo("hseeberger", "maven"))
 
 libraryDependencies ++= {
-  val AkkaVersion = "2.5.8"
   val AkkaHttpVersion = "10.0.10"
-  val Json4sVersion = "3.5.2"
   val QuillVersion= "2.3.2"
   val h2Version ="1.4.192"
+  val SlickVer ="3.2.1"
+  val OrgVer ="1.6.4"
   Seq(
     "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
     "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion,
     "ch.megard" %% "akka-http-cors" % "0.2.2",
     "de.heikoseeberger" %% "akka-http-json4s" % "1.16.0",
     "com.h2database" % "h2" % h2Version,
-    "io.getquill" %% "quill-jdbc" % QuillVersion
+    "io.getquill" %% "quill-jdbc" % QuillVersion,
+    "com.typesafe.slick" %% "slick" %  SlickVer,
+    "org.slf4j" % "slf4j-nop" % OrgVer,
+    "com.typesafe.slick" %% "slick-hikaricp" % SlickVer
   )
 }

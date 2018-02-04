@@ -1,20 +1,22 @@
 package backend.services
 import akka.actor.Actor
-import backend.db.DataBaseService
+import backend.db.{DataBaseService, SlickDBService}
 import backend.entities._
 
+import scala.concurrent.Future
+
 case class GetItems()
-case class AddNewItem(newItem :WebsiteItems)
-class ItemService extends Actor{
+case class AddNewItem(newItem: WebsiteItems)
+class ItemService extends Actor with SlickDBService {
 
 
   override def receive: Receive = {
     case GetItems () =>
-      val items :ItemsList = ItemsList(DataBaseService.getItemMethods.getAllItems())
-      sender() !  items
+      val allItems: Future[Seq[WebsiteItems]] = SlickItemsMethods.getAllItems
+      sender() ! allItems
 
     case AddNewItem(newItem :WebsiteItems) =>
-      val id :Int = DataBaseService.getItemMethods.addItem(newItem)
-      sender() ! id
+      val item = SlickItemsMethods.addItem(newItem)
+      sender() ! item
   }
 }

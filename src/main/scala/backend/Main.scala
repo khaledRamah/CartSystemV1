@@ -3,11 +3,6 @@ package backend
 import akka.actor._
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
-import akka.util.Timeout
-import backend.db.DataBaseService
-import io.getquill.{H2JdbcContext, SnakeCase}
-
-import scala.concurrent.duration._
 
 object Main extends  RestInterface with App  {
 
