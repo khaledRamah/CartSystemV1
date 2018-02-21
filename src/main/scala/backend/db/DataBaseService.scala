@@ -40,9 +40,9 @@ trait AllDbServices{
         val cart = ctx.run(getFromCartTable(CartId))
         val mergeIndexWithValue =(soldCartItems.map(item =>item.id) zip fullCartItems).map(z => SoldItemDetails(z._1,z._2))
         if (cart.nonEmpty)
-          FullCart(cart.head.id, SoldItemDetailsList(mergeIndexWithValue), cart.head.totalPrice)
+          FullCart(cart.head, SoldItemDetailsList(mergeIndexWithValue))
         else
-          FullCart(0, SoldItemDetailsList(List()), 0)
+          FullCart(Carts(0,0,0), SoldItemDetailsList(List()))
 
       }
 
@@ -65,9 +65,9 @@ trait AllDbServices{
           query[Carts].filter(cart => cart.id == lift(myNewCart.id)).update(lift(myNewCart))
         }
 
-        ctx.run(updateInCartTable(Carts(updatedCart.id,updatedCart.totalPrice)))
+        ctx.run(updateInCartTable(updatedCart.userCart))
         val idsList=updatedCart.itemsList.allSoldItemDetails.map(oneItem => oneItem.myItem.id)
-        soldItemsInstance.addList(idsList,updatedCart.id)
+        soldItemsInstance.addList(idsList,updatedCart.userCart.id)
       }
   }
   class ItemsMethods{
